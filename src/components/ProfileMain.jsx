@@ -7,7 +7,6 @@ const ProfileMain = () => {
   const { user, isAuthenticated } = useAuth0();
   const [myNotes, setMyNotes] = useState([]);
 
-  // Fetch notes uploaded by current user
   useEffect(() => {
     if (!isAuthenticated || !user?.email) return;
 
@@ -18,7 +17,12 @@ const ProfileMain = () => {
         .eq("user_email", user.email)
         .order("id", { ascending: false });
 
-      if (!error) setMyNotes(data);
+      if (error) {
+        console.error("Error fetching notes:", error);
+        return;
+      }
+
+      setMyNotes(data || []);
     };
 
     fetchMyNotes();
@@ -30,8 +34,10 @@ const ProfileMain = () => {
       bg-[repeating-linear-gradient(to_bottom,#f7fbff_0,#f7fbff_28px,#d0ebff_29px,#f7fbff_30px)]"
     >
       <div className="max-w-4xl mx-auto">
+        
         {/* USER HEADER */}
         <div className="bg-white/90 shadow-lg p-6 rounded-2xl mb-10 text-center backdrop-blur-sm">
+          
           <img
             src={logo}
             alt="Profile"
@@ -46,15 +52,18 @@ const ProfileMain = () => {
             Welcome back! Below are all the notes you've uploaded.
           </p>
 
-          <p className="text-gray-500 text-sm mt-1">Email: {user?.email}</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Email: {user?.email}
+          </p>
         </div>
 
         {/* USER NOTES */}
         <h3 className="text-xl font-bold mb-4">Your Uploaded Notes</h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+
           {myNotes.length === 0 && (
-            <p className="text-gray-600">You haven’t uploaded any notes yet.</p>
+            <p className="text-gray-600">You haven't uploaded any notes yet.</p>
           )}
 
           {myNotes.map((note) => {
@@ -65,7 +74,6 @@ const ProfileMain = () => {
                 key={note.id}
                 className="bg-white rounded-xl shadow p-4 hover:shadow-xl transition border"
               >
-                {/* PDF ICON */}
                 <div className="flex flex-col items-center py-4">
                   <i className="fas fa-file-pdf text-red-600 text-4xl"></i>
                   <p className="text-xs text-gray-500 mt-2 truncate w-full text-center">
@@ -75,7 +83,6 @@ const ProfileMain = () => {
 
                 <hr className="my-3" />
 
-                {/* DETAILS */}
                 <p className="text-sm">
                   <b className="text-gray-800">Course Code:</b>{" "}
                   {note.course_code}
@@ -90,7 +97,6 @@ const ProfileMain = () => {
                   Uploaded on: {new Date(note.created_at).toLocaleString()}
                 </p>
 
-                {/* VIEW BUTTON */}
                 <a
                   href={note.pdf_url}
                   target="_blank"

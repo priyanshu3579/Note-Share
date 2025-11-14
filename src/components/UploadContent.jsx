@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import { useAuth0 } from "@auth0/auth0-react";   // 🔥 ADD THIS
 import toast, { Toaster } from "react-hot-toast";
 
 const UploadContent = () => {
@@ -14,6 +15,7 @@ const UploadContent = () => {
 
   const inputRef = useRef();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth0();   // 🔥 ADD THIS
   const MAX_FILE_MB = 10;
 
   // ---------------- FILE VALIDATION ----------------
@@ -44,6 +46,11 @@ const UploadContent = () => {
     e.preventDefault();
     setError("");
 
+    if (!isAuthenticated || !user?.email) {
+      toast.error("Please login to upload notes.");
+      return;
+    }
+
     if (!courseCode.trim() || !programCode.trim()) {
       toast.error("Course code aur Program code zaruri hai.");
       return;
@@ -57,10 +64,9 @@ const UploadContent = () => {
     try {
       setUploading(true);
 
-      // UNIQUE NAME
       const fileName = `${Date.now()}_${file.name}`;
 
-      // 1️⃣ Upload to "notes" bucket
+      // 1️⃣ Upload to storage bucket
       const { error: uploadError } = await supabase.storage
         .from("notes")
         .upload(fileName, file, {
@@ -70,26 +76,28 @@ const UploadContent = () => {
 
       if (uploadError) throw uploadError;
 
-      // 2️⃣ Public URL
+      // 2️⃣ Get public URL
       const { data: publicUrlData } = supabase.storage
         .from("notes")
         .getPublicUrl(fileName);
 
       const pdfUrl = publicUrlData.publicUrl;
 
-      // 3️⃣ Insert metadata into table
+      // 3️⃣ Insert into table (🔥 FIXED)
       const { error: insertError } = await supabase.from("notes").insert({
         course_code: courseCode,
         program_code: programCode,
         description,
         pdf_url: pdfUrl,
+        user_email: user.email,   // 🔥 MOST IMPORTANT FIX
       });
 
       if (insertError) throw insertError;
 
-      setUploading(false);
       toast.success("Upload Successful!");
+      setUploading(false);
       navigate("/notes");
+
     } catch (err) {
       console.error("UPLOAD ERROR:", err);
       setUploading(false);
@@ -119,6 +127,7 @@ const UploadContent = () => {
         <h2 className="text-3xl font-bold mb-4">Upload Notes</h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+
           {/* COURSE + PROGRAM */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
@@ -175,6 +184,7 @@ const UploadContent = () => {
               Clear
             </button>
           </div>
+
         </form>
       </div>
     </main>

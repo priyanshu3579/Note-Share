@@ -1,6 +1,6 @@
 import React from 'react'
 import HomePage from './pages/HomePage'
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Routes, Route } from "react-router-dom"
 import Upload from './pages/Upload'
 import Profile from './pages/Profile'
 import Notes from './pages/Notes'
@@ -20,17 +20,17 @@ const App = () => {
       }}
       cacheLocation="localstorage"
       useRefreshTokens={true}
->
+    >
 
-      <BrowserRouter>
-        <Routes>
-          <Route path='/' element={<HomePage />} />
-          <Route path='/upload' element={<Upload />} />
-          <Route path='/profile' element={<Profile />} />
-          <Route path='/notes' element={<Notes />} />
-          <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-        </Routes>
-      </BrowserRouter>
+      {/* REMOVE BrowserRouter completely */}
+      <Routes>
+        <Route path='/' element={<HomePage />} />
+        <Route path='/upload' element={<Upload />} />
+        <Route path='/profile' element={<Profile />} />
+        <Route path='/notes' element={<Notes />} />
+        <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+      </Routes>
+
     </Auth0Provider>
   )
 }
