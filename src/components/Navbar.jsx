@@ -62,7 +62,7 @@ const Navbar = () => {
                   onClick={() => handleProtectedClick("/")}
                   className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10"
                 >
-                  <i class="fa-solid fa-house"></i> Home
+                  <i className="fa-solid fa-house"></i> Home
                 </button>
 
                 {/* Upload */}
@@ -136,7 +136,7 @@ const Navbar = () => {
               onClick={() => handleProtectedClick("/")}
               className="hover:text-[#38ef7d] font-medium"
             >
-              <i class="fa-solid fa-house"></i>  Home
+              <i className="fa-solid fa-house"></i>  Home
             </button>
 
             {/* Upload */}
