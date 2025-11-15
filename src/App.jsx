@@ -21,13 +21,8 @@ const App = () => {
       }}
       cacheLocation="localstorage"
       useRefreshTokens={true}
-      onRedirectCallback={(appState) => {
-        window.history.replaceState(
-          {},
-          document.title,
-          appState?.returnTo || "/"
-        );
-      }}
+      onRedirectCallback={() => {}}
+
     >
 
       <Routes>
