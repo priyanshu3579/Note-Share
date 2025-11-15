@@ -7,6 +7,19 @@ const ProfileMain = () => {
   const { user, isAuthenticated } = useAuth0();
   const [myNotes, setMyNotes] = useState([]);
 
+  // 🕒 Convert UTC → IST (Perfect Indian Time)
+  const formatDate = (utcDate) => {
+    const date = new Date(utcDate);
+
+    // IST = UTC + 5 hours 30 minutes
+    const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+    const istTime = new Date(date.getTime() + IST_OFFSET);
+
+    return istTime.toLocaleString("en-IN", {
+      hour12: true,
+    });
+  };
+
   useEffect(() => {
     if (!isAuthenticated || !user?.email) return;
 
@@ -94,7 +107,7 @@ const ProfileMain = () => {
                 </p>
 
                 <p className="text-xs text-gray-500 mt-2">
-                  Uploaded on: {new Date(note.created_at).toLocaleString()}
+                  Uploaded on: {formatDate(note.created_at)}
                 </p>
 
                 <a

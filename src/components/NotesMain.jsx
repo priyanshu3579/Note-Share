@@ -5,6 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 const NotesMain = () => {
   const [notes, setNotes] = useState([]);
+  const [search, setSearch] = useState("");   // 🔥 ADD THIS
   const { user, isAuthenticated } = useAuth0();
 
   // CHECK ADMIN ROLE
@@ -24,6 +25,15 @@ const NotesMain = () => {
   useEffect(() => {
     fetchNotes();
   }, []);
+
+  // 🔥 FILTERED NOTES LIST
+  const filteredNotes = notes.filter((note) => {
+    const s = search.toLowerCase();
+    return (
+      note.course_code.toLowerCase().includes(s) ||
+      note.program_code.toLowerCase().includes(s)
+    );
+  });
 
   // DELETE FUNCTION
   const deleteNote = async (note) => {
@@ -60,8 +70,26 @@ const NotesMain = () => {
           Uploaded Notes
         </h1>
 
+        {/* 🔥 SEARCH BAR */}
+        <div className="flex justify-center mb-8">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by Course Code or Program Code..."
+            className="w-full max-w-md px-4 py-2 border rounded-lg shadow-sm"
+          />
+        </div>
+
+        {/* 🔥 NO RESULTS */}
+        {filteredNotes.length === 0 && (
+          <p className="text-center text-gray-600 mt-10">
+            No matching notes found.
+          </p>
+        )}
+
+        {/* NOTES GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {notes.map((note) => {
+          {filteredNotes.map((note) => {
             const fileName = note.pdf_url.split("/").pop();
 
             return (

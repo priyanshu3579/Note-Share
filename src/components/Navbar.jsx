@@ -1,10 +1,24 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate  } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const Navbar = () => {
+
+  const navigate = useNavigate();
+
   const { user, loginWithRedirect, isAuthenticated, logout } = useAuth0();
-  // console.log("USER DETAILS --->", user);
+
+  // COMMON PROTECTED CLICK HANDLER
+  const handleProtectedClick = (path) => {
+  if (!isAuthenticated) {
+    loginWithRedirect({
+      appState: { returnTo: path }
+    });
+  } else {
+    navigate(path);
+  }
+};
+
 
   return (
     <header className="w-full bg-gradient-to-r from-[#0f2027] via-[#203a43] to-[#2c5364] text-white shadow-md">
@@ -32,10 +46,10 @@ const Navbar = () => {
 
             {/* MOBILE MENU */}
             <div
-              className="absolute right-0 mt-2 w-44 bg-[#1d2c33] rounded-lg shadow-lg hidden 
+              className="absolute right-0 mt-2 w-48 bg-[#1d2c33] rounded-lg shadow-lg hidden 
                 peer-checked:block transition-all z-50"
             >
-              <div className="flex flex-col p-3 space-y-2">
+              <div className="flex flex-col p-3 space-y-3">
 
                 {/* Greeting */}
                 {isAuthenticated && (
@@ -44,12 +58,43 @@ const Navbar = () => {
                   </p>
                 )}
 
-                {/* ADMIN BUTTON (Mobile) */}
+                <button
+                  onClick={() => handleProtectedClick("/")}
+                  className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10"
+                >
+                  <i class="fa-solid fa-house"></i> Home
+                </button>
+
+                {/* Upload */}
+                <button
+                  onClick={() => handleProtectedClick("/upload")}
+                  className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10"
+                >
+                  <i className="fas fa-upload"></i> Upload
+                </button>
+
+                {/* Notes */}
+                <button
+                  onClick={() => handleProtectedClick("/notes")}
+                  className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10"
+                >
+                  <i className="fas fa-book"></i> Notes
+                </button>
+
+                {/* Profile */}
+                <button
+                  onClick={() => handleProtectedClick("/profile")}
+                  className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10"
+                >
+                  <i className="fas fa-user"></i> Profile
+                </button>
+
+                {/* Admin */}
                 {isAuthenticated &&
                   user?.["https://noteshare.com/roles"]?.includes("admin") && (
                     <Link
                       to="/admin"
-                      className="cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10 text-yellow-300"
+                      className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10 text-yellow-300"
                     >
                       <i className="fas fa-tools"></i> Admin
                     </Link>
@@ -59,7 +104,7 @@ const Navbar = () => {
                 {!isAuthenticated && (
                   <button
                     onClick={() => loginWithRedirect()}
-                    className="cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10"
                   >
                     <i className="fas fa-sign-in-alt"></i> Login
                   </button>
@@ -69,22 +114,14 @@ const Navbar = () => {
                 {isAuthenticated && (
                   <button
                     onClick={() =>
-                      logout({ logoutParams: { returnTo: window.location.origin } })
+                      logout({
+                        logoutParams: { returnTo: window.location.origin },
+                      })
                     }
-                    className="cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10 text-red-400"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10 text-red-400"
                   >
                     <i className="fas fa-sign-out-alt"></i> Logout
                   </button>
-                )}
-
-                {/* Register */}
-                {!isAuthenticated && (
-                  <Link
-                    to="/register"
-                    className="cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10"
-                  >
-                    <i className="fas fa-user-plus"></i> Register
-                  </Link>
                 )}
 
               </div>
@@ -95,23 +132,55 @@ const Navbar = () => {
           {/* DESKTOP MENU */}
           <div className="hidden md:flex items-center gap-6">
 
-            {/* Greeting */}
-            {isAuthenticated && (
-              <p className="font-semibold hover:text-[#38ef7d]">
-                Hello {user.name}
-              </p>
-            )}
+            <button
+              onClick={() => handleProtectedClick("/")}
+              className="hover:text-[#38ef7d] font-medium"
+            >
+              <i class="fa-solid fa-house"></i>  Home
+            </button>
 
-            {/* ADMIN BUTTON (Desktop) */}
+            {/* Upload */}
+            <button
+              onClick={() => handleProtectedClick("/upload")}
+              className="hover:text-[#38ef7d] font-medium"
+            >
+            <i className="fas fa-upload"></i> Upload  
+            </button>
+
+            {/* Notes */}
+            <button
+              onClick={() => handleProtectedClick("/notes")}
+              className="hover:text-[#38ef7d] font-medium"
+            >
+              <i className="fas fa-book"></i> Notes
+            </button>
+
+            {/* Profile */}
+            <button
+              onClick={() => handleProtectedClick("/profile")}
+              className="hover:text-[#38ef7d] font-medium"
+            >
+              <i className="fas fa-user"></i>  Profile
+            </button>
+
+            {/* Admin */}
             {isAuthenticated &&
               user?.["https://noteshare.com/roles"]?.includes("admin") && (
                 <Link
                   to="/admin"
-                  className="cursor-pointer font-semibold text-red-600 hover:text-yellow-300"
+                  className="cursor-pointer font-semibold text-yellow-300 hover:text-yellow-200"
                 >
-                  You are the admin
+                <i className="fas fa-tools"></i>  Admin
                 </Link>
               )}
+
+              {/* Greeting (Desktop) */}
+              {isAuthenticated && (
+                <p className="font-semibold text-[#38ef7d]">
+                  Hello {user.name}
+                </p>
+              )}
+
 
             {/* Login / Logout */}
             {isAuthenticated ? (
@@ -131,7 +200,6 @@ const Navbar = () => {
                 <i className="fas fa-sign-in-alt"></i> Login
               </button>
             )}
-
           </div>
 
         </div>
